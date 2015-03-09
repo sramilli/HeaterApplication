@@ -50,6 +50,7 @@ public class Thermostat implements PinListener{
 
     @Override
     public void valueChanged(PinEvent event) {
+        System.out.println("GOT EVENT!!!!!!");
         GPIOPin tPin = event.getDevice();
         if (tPin == iSwitch.getPin()){
             if (event.getValue() == ON){  // pushing down
