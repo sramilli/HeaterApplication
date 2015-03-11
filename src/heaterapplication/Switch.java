@@ -24,7 +24,7 @@ public class Switch{
     private GPIOPin iSwitch;
     
     public Switch(int aPort, int aPin) throws IOException{
-                GPIOPinConfig pinConfig = new GPIOPinConfig(aPort, aPin, GPIOPinConfig.DIR_INPUT_ONLY, DeviceConfig.DEFAULT, GPIOPinConfig.TRIGGER_BOTH_EDGES, false);
+                GPIOPinConfig pinConfig = new GPIOPinConfig(aPort, aPin, GPIOPinConfig.DIR_INPUT_ONLY, DeviceConfig.DEFAULT, GPIOPinConfig.TRIGGER_RISING_EDGE, false);
                 iSwitch = DeviceManager.open(pinConfig);
                 //iSwitch.setInputListener(this);
     }

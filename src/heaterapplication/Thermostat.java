@@ -18,71 +18,63 @@ import jdk.dio.gpio.PinListener;
  * @author Ste
  */
 public class Thermostat implements PinListener{
+    private Led iStatusLED;
     private Led iGreenLED;
-    private Led iRedLED;
     private Led iYellowLED;
+    private Led iRedLED;
     private Switch iSwitch;
-    
-    private int iSwitchPortID;
-    private int iSwitchPinID;
-    private int iGreenLEDPinNumber;
-    private int iRedLEDPinNumber;
-    private int iYellowLEDPinNumber;
+    private Controller iController;
     
     public static boolean ON = true;
     public static boolean OFF = false;
     
-    public Thermostat(final int switchPortID, final int switchPinID, final int aGreenLEDPinNumber, final int aRedLEDPinNumber, final int aYellowLEDPinNumber) {
-        this.iSwitchPortID = switchPortID;
-        this.iSwitchPinID = switchPinID;
-        this.iGreenLEDPinNumber = aGreenLEDPinNumber;
-        this.iRedLEDPinNumber = aRedLEDPinNumber;
-        this.iYellowLEDPinNumber = aYellowLEDPinNumber;
+    public Thermostat(int aSwitchPortID,int aSwitchPinID,int aStatusLEDPinNumber,int aGreenLEDPinNumber,int aYellowLEDPinNumber,int aRedLEDPinNumber) throws IOException {
+        iStatusLED = new Led(aStatusLEDPinNumber);
+        iGreenLED = new Led(aGreenLEDPinNumber);
+        iYellowLED = new Led(aYellowLEDPinNumber);
+        iRedLED = new Led(aRedLEDPinNumber);
+        iSwitch = new Switch(aSwitchPortID, aSwitchPinID);
+        iSwitch.setInputListener(this);
+        iController = new Controller(iStatusLED, iGreenLED, iYellowLED, iRedLED);
     }
     
-    public void init() throws IOException {
-        iGreenLED = new Led(iGreenLEDPinNumber);
-        iRedLED = new Led(iRedLEDPinNumber);
-        iYellowLED = new Led(iYellowLEDPinNumber);
-        iSwitch = new Switch(iSwitchPortID, iSwitchPinID);
-        iSwitch.setInputListener(this);
-    }
-
+    private boolean bouncing = false;
     @Override
-    public void valueChanged(PinEvent event) {
-        GPIOPin tPin = event.getDevice();
-        if (tPin == iSwitch.getPin()){
-            if (event.getValue() == ON){  // pushing down
-                try {
-                    System.out.println("Pushing Down");
-                    iGreenLED.setValue(!iGreenLED.getValue());
-                    iRedLED.setValue(!iRedLED.getValue());
-                    iYellowLED.setValue(!iYellowLED.getValue());
-                } catch (IOException ex) {
-                    Logger.getLogger(Thermostat.class.getName()).log(Level.SEVERE, null, ex);
+    public void valueChanged(final PinEvent event) {
+        if (!bouncing) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    bouncing = true;
+                    GPIOPin tPin = event.getDevice();
+                    if (tPin == iSwitch.getPin()){
+                        if (event.getValue() == ON){  // pushing down
+                            try {
+                                iController.switchMode();
+                                Thread.sleep(600);
+                            } catch (InterruptedException | IOException ex) {
+                                Logger.getLogger(Thermostat.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            bouncing = false;
+                        }
+                    }
                 }
-            } else /*if(event.getValue() == OFF)*/{  //not implemented
-                try {
-                    System.out.println("Releasing");
-                    iGreenLED.turnOff();
-                    iRedLED.turnOff();
-                    iYellowLED.turnOff();
-                } catch (IOException ex) {
-                    Logger.getLogger(Thermostat.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
+            }).start();
         }
     }
     
     public void stop() throws IOException{
+        if (iStatusLED != null){
+            iStatusLED.close();
+        }
         if (iGreenLED != null){
             iGreenLED.close();
         }
-        if (iRedLED != null){
-            iRedLED.close();
-        }
         if (iYellowLED != null){
             iYellowLED.close();
+        }
+        if (iRedLED != null){
+            iRedLED.close();
         }
         if (iSwitch != null){
             iSwitch.close();
