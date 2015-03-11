@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import jdk.dio.DeviceManager;
 import jdk.dio.gpio.GPIOPin;
+import jdk.dio.gpio.GPIOPinConfig;
 
 /**
  *
@@ -23,12 +24,13 @@ public class Led {
     private boolean iInitialStatus = false;
     
     public Led(int aPin) throws IOException{
-        iLED = DeviceManager.open(aPin);
+        //GPIOPinConfig tConfig = new GPIOPinConfig(0, aPin, GPIOPinConfig.DIR_OUTPUT_ONLY, GPIOPinConfig.MODE_OUTPUT_PUSH_PULL, GPIOPinConfig.TRIGGER_BOTH_EDGES, iInitialStatus);
+        iLED = (GPIOPin)DeviceManager.open(aPin);
         iLED.setValue(iInitialStatus);
     }
     
     public Led(int aPin, boolean aInitialStatus) throws IOException{
-        iLED = DeviceManager.open(aPin);
+        iLED = (GPIOPin)DeviceManager.open(aPin);
         iInitialStatus = aInitialStatus;
         iLED.setValue(iInitialStatus);
     }
@@ -41,7 +43,7 @@ public class Led {
         iLED.setValue(false);
     }
     
-    private void setValue(boolean aValue) throws IOException{
+    public void setValue(boolean aValue) throws IOException{
         iLED.setValue(aValue);
     }
     

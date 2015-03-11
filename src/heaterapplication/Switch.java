@@ -19,7 +19,7 @@ import jdk.dio.gpio.PinListener;
  *
  * @author Ste
  */
-public class Switch implements PinListener{
+public class Switch{
     
     private GPIOPin iSwitch;
     
@@ -29,16 +29,16 @@ public class Switch implements PinListener{
                 //iSwitch.setInputListener(this);
     }
     
-    public Switch(GPIOPinConfig aConf) throws IOException{
+/*    public Switch(GPIOPinConfig aConf) throws IOException{
                 iSwitch = DeviceManager.open(aConf);
                 iSwitch.setInputListener(this);
-    }
+    }*/
     
     public GPIOPin getPin(){
         return iSwitch;
     }
 
-    @Override
+/*    @Override
     public void valueChanged(PinEvent event) {
         GPIOPin pin = event.getDevice();
         if (pin == iSwitch){
@@ -49,6 +49,7 @@ public class Switch implements PinListener{
             }
         }
     }
+*/
     
     /**
 * Method to stop connection to the pin
@@ -61,8 +62,8 @@ public class Switch implements PinListener{
         }
     }
     
-    public void setInputListener(PinListener listener) throws IOException, ClosedDeviceException{
-        iSwitch.setInputListener(listener);
+    public void setInputListener(PinListener aListener) throws IOException, ClosedDeviceException{
+        iSwitch.setInputListener(aListener);
     }
     
 }

@@ -40,7 +40,7 @@ public class Thermostat implements PinListener{
         this.iYellowLEDPinNumber = aYellowLEDPinNumber;
     }
     
-    public void start() throws IOException {
+    public void init() throws IOException {
         iGreenLED = new Led(iGreenLEDPinNumber);
         iRedLED = new Led(iRedLEDPinNumber);
         iYellowLED = new Led(iYellowLEDPinNumber);
@@ -50,20 +50,20 @@ public class Thermostat implements PinListener{
 
     @Override
     public void valueChanged(PinEvent event) {
-        System.out.println("GOT EVENT!!!!!!");
         GPIOPin tPin = event.getDevice();
         if (tPin == iSwitch.getPin()){
             if (event.getValue() == ON){  // pushing down
                 try {
-                    iGreenLED.turnOn();
-                    iRedLED.turnOn();
-                    iYellowLED.turnOn();
-                    //iRedLED.turnOn();
+                    System.out.println("Pushing Down");
+                    iGreenLED.setValue(!iGreenLED.getValue());
+                    iRedLED.setValue(!iRedLED.getValue());
+                    iYellowLED.setValue(!iYellowLED.getValue());
                 } catch (IOException ex) {
                     Logger.getLogger(Thermostat.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } else if(event.getValue() == OFF){
+            } else /*if(event.getValue() == OFF)*/{  //not implemented
                 try {
+                    System.out.println("Releasing");
                     iGreenLED.turnOff();
                     iRedLED.turnOff();
                     iYellowLED.turnOff();
@@ -82,7 +82,7 @@ public class Thermostat implements PinListener{
             iRedLED.close();
         }
         if (iYellowLED != null){
-            iRedLED.close();
+            iYellowLED.close();
         }
         if (iSwitch != null){
             iSwitch.close();
