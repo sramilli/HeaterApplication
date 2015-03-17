@@ -17,6 +17,7 @@ public class HeaterApplication extends MIDlet {
     
     Thermostat iThermostat;
     private static int STATUS = 18;
+    private static int HEATER = 7;
     private static int GREEN = 23;
     private static int YELLOW = 25;
     private static int RED = 24;
@@ -27,7 +28,8 @@ public class HeaterApplication extends MIDlet {
     public void startApp() {
         System.out.println("Starting HeaterApplication...");
         try {
-            iThermostat = new Thermostat(SWITCH_PORT, SWITCH, STATUS, GREEN, YELLOW, RED);
+            iThermostat = new Thermostat(SWITCH_PORT, SWITCH, STATUS, GREEN, YELLOW, RED, HEATER);
+            //iThermostat.testRelay();
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }

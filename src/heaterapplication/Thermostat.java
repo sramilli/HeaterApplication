@@ -7,6 +7,7 @@
 package heaterapplication;
 
 import java.io.IOException;
+import static java.lang.Thread.sleep;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jdk.dio.gpio.GPIOPin;
@@ -19,6 +20,7 @@ import jdk.dio.gpio.PinListener;
  */
 public class Thermostat implements PinListener{
     private Led iStatusLED;
+    private Relay iHeaterRelay;
     private Led iGreenLED;
     private Led iYellowLED;
     private Led iRedLED;
@@ -28,14 +30,31 @@ public class Thermostat implements PinListener{
     public static boolean ON = true;
     public static boolean OFF = false;
     
-    public Thermostat(int aSwitchPortID,int aSwitchPinID,int aStatusLEDPinNumber,int aGreenLEDPinNumber,int aYellowLEDPinNumber,int aRedLEDPinNumber) throws IOException {
+    public Thermostat(int aSwitchPortID,int aSwitchPinID,int aStatusLEDPinNumber,int aGreenLEDPinNumber,int aYellowLEDPinNumber,int aRedLEDPinNumber, int aHeaterRELAYPinNumber) throws IOException {
         iStatusLED = new Led(aStatusLEDPinNumber);
+        iHeaterRelay = new Relay(aHeaterRELAYPinNumber);
         iGreenLED = new Led(aGreenLEDPinNumber);
         iYellowLED = new Led(aYellowLEDPinNumber);
         iRedLED = new Led(aRedLEDPinNumber);
         iSwitch = new Switch(aSwitchPortID, aSwitchPinID);
         iSwitch.setInputListener(this);
         iController = new Controller(iStatusLED, iGreenLED, iYellowLED, iRedLED);
+    }
+    
+    public void testRelay(){
+        for (int i=1; i<8; i++){
+            try {   System.out.println("Turning on "+i);
+                    iHeaterRelay.turnOn();
+                    sleep(500);
+                    System.out.println("Turning off "+i);
+                    iHeaterRelay.turnOff();
+                    sleep(500);
+            } catch (IOException ex) {
+                Logger.getLogger(Thermostat.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Thermostat.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
     
     private boolean bouncing = false;
@@ -66,6 +85,9 @@ public class Thermostat implements PinListener{
     public void stop() throws IOException{
         if (iStatusLED != null){
             iStatusLED.close();
+        }
+        if (iHeaterRelay != null){
+            iHeaterRelay.close();
         }
         if (iGreenLED != null){
             iGreenLED.close();
