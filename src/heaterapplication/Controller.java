@@ -17,26 +17,24 @@ import jdk.dio.gpio.PinListener;
  *
  * @author Ste
  */
-class Controller implements PinListener{
+class Controller{
     private int iState;
     private Led iHeaterStatus;
     private Relay iHeaterRelay;
     private Led iLedGreen;
     private Led iLedYellow;
     private Led iLedRed;
-    private Switch iManualThermostat;
     
     public static boolean ON = true;
     public static boolean OFF = false;
     
-    public Controller(Led aHeaterStatus, Led aGreen, Led aYellow, Led aRed, Relay aRelay, Switch aManualThermostat){
+    public Controller(Led aHeaterStatus, Led aGreen, Led aYellow, Led aRed, Relay aRelay){
         iState = 3;
         iHeaterStatus = aHeaterStatus;
         iHeaterRelay = aRelay;
         iLedGreen = aGreen;
         iLedYellow = aYellow;
         iLedRed = aRed;
-        iManualThermostat = aManualThermostat;
         try {
             activateOutput();
         } catch (IOException ex) {
@@ -81,44 +79,4 @@ class Controller implements PinListener{
         }
     }
 
-    private boolean bouncing = false;
-    @Override
-    public void valueChanged(final PinEvent event) {
-        System.out.println("Switch heater relay!!!");
-        if (!bouncing) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    bouncing = true;
-                    GPIOPin tPin = event.getDevice();
-                    if (tPin == iManualThermostat.getPin()){
-                        if (event.getValue() == ON){  // pushing down
-                            System.out.println("Switch heater relay ON!!!");
-                            try {
-                                if (iState == 2){
-                                    iHeaterRelay.turnOn();
-                                }
-                                Thread.sleep(600);
-                            } catch (InterruptedException | IOException ex) {
-                                Logger.getLogger(Thermostat.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                            bouncing = false;
-                        }else if (event.getValue() == OFF){
-                            System.out.println("Switch heater relay OFF!!!");
-                            try {
-                                if (iState == 2){
-                                    iHeaterRelay.turnOff();
-                                }
-                                Thread.sleep(600);
-                            } catch (InterruptedException | IOException ex) {
-                                Logger.getLogger(Thermostat.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                            bouncing = false;
-                        }
-                    }
-                }
-            }).start();
-        }
-    }
-    
 }

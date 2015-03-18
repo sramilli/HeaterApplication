@@ -31,7 +31,7 @@ public class Thermostat implements PinListener{
     public static boolean ON = true;
     public static boolean OFF = false;
     
-    public Thermostat(int aModeSwitchPortID,int aModeSwitchPinID, int aManualThermostatPortID, int aManualThermostatPinID, int aStatusLEDPinNumber,int aGreenLEDPinNumber,int aYellowLEDPinNumber,int aRedLEDPinNumber, int aHeaterRELAYPinNumber) throws IOException {
+    public Thermostat(int aModeSwitchPortID, int aModeSwitchPinID, int aManualThermostatPortID, int aManualThermostatPinID, int aStatusLEDPinNumber,int aGreenLEDPinNumber,int aYellowLEDPinNumber,int aRedLEDPinNumber, int aHeaterRELAYPinNumber) throws IOException {
         iStatusLED = new Led(aStatusLEDPinNumber);
         iHeaterRelay = new Relay(aHeaterRELAYPinNumber);
         iGreenLED = new Led(aGreenLEDPinNumber);
@@ -40,8 +40,8 @@ public class Thermostat implements PinListener{
         iModeSwitch = new Switch(aModeSwitchPortID, aModeSwitchPinID);
         iModeSwitch.setInputListener(this);
         iManualTherostat = new Switch(aManualThermostatPortID, aManualThermostatPinID);
-        iController = new Controller(iStatusLED, iGreenLED, iYellowLED, iRedLED, iHeaterRelay, iManualTherostat);
-        iManualTherostat.setInputListener(iController);
+        iManualTherostat.setInputListener(this);
+        iController = new Controller(iStatusLED, iGreenLED, iYellowLED, iRedLED, iHeaterRelay);
     }
     
     public void testRelay(){
@@ -69,6 +69,7 @@ public class Thermostat implements PinListener{
                 public void run() {
                     bouncing = true;
                     GPIOPin tPin = event.getDevice();
+                    //Its the mode switcher button
                     if (tPin == iModeSwitch.getPin()){
                         if (event.getValue() == ON){  // pushing down
                             try {
@@ -80,9 +81,23 @@ public class Thermostat implements PinListener{
                             }
                             bouncing = false;
                         }
+                    //its the manual thermostat switch
+                    } else if (tPin == iManualTherostat.getPin()){
+                        if (event.getValue() == ON){  // pushing down
+                            try {
+                                System.out.println("Pushing Manual Thermostat!!!");
+                                
+                                Thread.sleep(600);
+                            } catch (InterruptedException  ex) {
+                                Logger.getLogger(Thermostat.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            bouncing = false;
+                        }
                     }
                 }
             }).start();
+        }else {
+            System.out.println("Bouncing in Thermostat!!");
         }
     }
     
