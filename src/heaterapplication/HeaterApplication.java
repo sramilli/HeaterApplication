@@ -21,14 +21,16 @@ public class HeaterApplication extends MIDlet {
     private static int GREEN = 23;
     private static int YELLOW = 25;
     private static int RED = 24;
-    private static int SWITCH = 27;
-    private static int SWITCH_PORT = 0;
+    private static int MODE_SWITCH = 27;
+    private static int MODE_SWITCH_PORT = 0;
+    private static int MANUAL_THERMOSTAT = 22;
+    private static int MANUAL_THERMOSTAT_PORT = 0;
         
     @Override
     public void startApp() {
         System.out.println("Starting HeaterApplication...");
         try {
-            iThermostat = new Thermostat(SWITCH_PORT, SWITCH, STATUS, GREEN, YELLOW, RED, HEATER);
+            iThermostat = new Thermostat(MODE_SWITCH_PORT, MODE_SWITCH, MANUAL_THERMOSTAT_PORT, MANUAL_THERMOSTAT, STATUS, GREEN, YELLOW, RED, HEATER);
             //iThermostat.testRelay();
         } catch (IOException ex) {
             System.out.println(ex.getMessage());

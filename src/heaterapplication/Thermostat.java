@@ -24,21 +24,24 @@ public class Thermostat implements PinListener{
     private Led iGreenLED;
     private Led iYellowLED;
     private Led iRedLED;
-    private Switch iSwitch;
+    private Switch iModeSwitch;
+    private Switch iManualTherostat;
     private Controller iController;
     
     public static boolean ON = true;
     public static boolean OFF = false;
     
-    public Thermostat(int aSwitchPortID,int aSwitchPinID,int aStatusLEDPinNumber,int aGreenLEDPinNumber,int aYellowLEDPinNumber,int aRedLEDPinNumber, int aHeaterRELAYPinNumber) throws IOException {
+    public Thermostat(int aModeSwitchPortID,int aModeSwitchPinID, int aManualThermostatPortID, int aManualThermostatPinID, int aStatusLEDPinNumber,int aGreenLEDPinNumber,int aYellowLEDPinNumber,int aRedLEDPinNumber, int aHeaterRELAYPinNumber) throws IOException {
         iStatusLED = new Led(aStatusLEDPinNumber);
         iHeaterRelay = new Relay(aHeaterRELAYPinNumber);
         iGreenLED = new Led(aGreenLEDPinNumber);
         iYellowLED = new Led(aYellowLEDPinNumber);
         iRedLED = new Led(aRedLEDPinNumber);
-        iSwitch = new Switch(aSwitchPortID, aSwitchPinID);
-        iSwitch.setInputListener(this);
-        iController = new Controller(iStatusLED, iGreenLED, iYellowLED, iRedLED);
+        iModeSwitch = new Switch(aModeSwitchPortID, aModeSwitchPinID);
+        iModeSwitch.setInputListener(this);
+        iManualTherostat = new Switch(aManualThermostatPortID, aManualThermostatPinID);
+        iController = new Controller(iStatusLED, iGreenLED, iYellowLED, iRedLED, iHeaterRelay, iManualTherostat);
+        iManualTherostat.setInputListener(iController);
     }
     
     public void testRelay(){
@@ -66,9 +69,10 @@ public class Thermostat implements PinListener{
                 public void run() {
                     bouncing = true;
                     GPIOPin tPin = event.getDevice();
-                    if (tPin == iSwitch.getPin()){
+                    if (tPin == iModeSwitch.getPin()){
                         if (event.getValue() == ON){  // pushing down
                             try {
+                                System.out.println("Switch MODE!!!");
                                 iController.switchMode();
                                 Thread.sleep(600);
                             } catch (InterruptedException | IOException ex) {
@@ -98,8 +102,11 @@ public class Thermostat implements PinListener{
         if (iRedLED != null){
             iRedLED.close();
         }
-        if (iSwitch != null){
-            iSwitch.close();
+        if (iModeSwitch != null){
+            iModeSwitch.close();
+        }
+        if (iManualTherostat != null){
+            iManualTherostat.close();
         }
     }
 }
