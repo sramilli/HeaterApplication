@@ -79,4 +79,19 @@ class Controller{
         }
     }
 
+    void activateManualThermostat() throws IOException {
+        if (iState == 2 ){
+            iHeaterStatus.turnOn();
+            iHeaterRelay.turnOn();
+        }
+    }
+
+    void deActivateManualThermostat() throws IOException {
+
+        if (iState == 2 ){
+            iHeaterStatus.turnOff();
+            iHeaterRelay.turnOff();
+        }
+    }
+
 }
